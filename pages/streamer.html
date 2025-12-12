@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">StreamRec - Página de Streamer</title>
+    <meta name="description" content="Recomienda películas a tu streamer favorito">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/globals.css">
+    <link rel="stylesheet" href="../css/movie-grid.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="../index.html" class="logo" style="text-decoration: none;">🎬 StreamRec</a>
+
+            <ul class="nav-links">
+                <li><a href="../index.html">Inicio</a></li>
+                <li><a href="#" id="myPageLink" style="display: none;">Mi Página</a></li>
+                <li><a href="#" id="adminLink" style="display: none;">Admin</a></li>
+            </ul>
+
+            <div class="flex gap-2 align-items-center">
+                <div id="userInfo" style="display: none;" class="flex gap-2 align-items-center">
+                    <img id="userAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                    <span id="userName"></span>
+                </div>
+                <button id="authBtn" class="btn btn-primary">Iniciar Sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Streamer Header -->
+            <section class="streamer-header" style="padding: 3rem 0 2rem;">
+                <div class="flex-between" style="margin-bottom: 2rem;">
+                    <div class="flex gap-3 align-items-center">
+                        <img id="streamerAvatar" src="" alt="Streamer"
+                            style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary);">
+                        <div>
+                            <h1 id="streamerName" style="margin-bottom: 0.5rem;">Cargando...</h1>
+                            <p class="text-muted" id="streamerPlatform"></p>
+                            <div class="flex gap-2 mt-2">
+                                <span class="badge"
+                                    style="background: var(--primary); padding: 0.25rem 0.75rem; border-radius: var(--radius-md); font-size: 0.875rem;">
+                                    <span id="movieCount">0</span> películas recomendadas
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="flex gap-2" id="streamerControls" style="display: none;">
+                        <div class="card" style="padding: 1rem; display: flex; align-items: center; gap: 1rem;">
+                            <div>
+                                <label for="languageSelect"
+                                    style="display: block; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Idioma
+                                    de Trailers</label>
+                                <select id="languageSelect" style="width: 150px;"></select>
+                            </div>
+
+                            <div>
+                                <label for="adultFilter"
+                                    style="display: block; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Filtro
+                                    +18</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="adultFilter" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Share Link -->
+                <div class="card" style="padding: 1.5rem; background: rgba(139, 92, 246, 0.1);">
+                    <div class="flex-between">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Comparte tu página</h4>
+                            <p class="text-muted" style="font-size: 0.875rem;">Comparte este link con tu comunidad para
+                                que recomienden películas</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="shareLink" readonly style="width: 400px; cursor: pointer;"
+                                onclick="this.select()">
+                            <button class="btn btn-primary" onclick="copyShareLink()">Copiar</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Section -->
+            <section class="search-section" style="margin: 2rem 0;">
+                <div class="card" style="padding: 1.5rem;">
+                    <div class="flex gap-2">
+                        <input type="text" id="searchInput" placeholder="Buscar películas para recomendar..."
+                            style="flex: 1;">
+                        <button class="btn btn-primary" onclick="searchMovies()">Buscar</button>
+                        <button class="btn btn-secondary" onclick="loadPopularMovies()">Populares</button>
+                        <button class="btn btn-secondary" onclick="loadTopRatedMovies()">Top Rated</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Movie Grid -->
+            <section class="movie-section">
+                <h2 id="sectionTitle">Películas Recomendadas</h2>
+                <div id="movieGrid" class="movie-grid">
+                    <!-- Loading skeletons -->
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/tmdb.js"></script>
+    <script src="../js/streamer.js"></script>
+
+    <style>
+        .align-items-center {
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-block;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(139, 92, 246, 0.2);
+            transition: 0.4s;
+            border-radius: 28px;
+            border: 2px solid var(--primary);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--primary);
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(22px);
+            background-color: white;
+        }
+    </style>
+</body>
+
+</html>

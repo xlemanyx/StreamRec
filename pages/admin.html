@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - StreamRec</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/globals.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="../index.html" class="logo" style="text-decoration: none;">🎬 StreamRec</a>
+
+            <ul class="nav-links">
+                <li><a href="../index.html">Inicio</a></li>
+                <li><a href="#" id="myPageLink" style="display: none;">Mi Página</a></li>
+                <li><a href="admin.html" class="active">Admin</a></li>
+            </ul>
+
+            <div class="flex gap-2 align-items-center">
+                <div id="userInfo" style="display: none;" class="flex gap-2 align-items-center">
+                    <img id="userAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                    <span id="userName"></span>
+                </div>
+                <button id="authBtn" class="btn btn-primary">Iniciar Sesión</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <section style="padding: 3rem 0;">
+                <h1 class="mb-3">Panel de Administración</h1>
+                <p class="text-muted mb-5">Gestiona recomendaciones y puntuaciones</p>
+
+                <!-- Stats Cards -->
+                <div class="grid"
+                    style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+                    <div class="card">
+                        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem;" id="totalStreamers">0</h3>
+                        <p class="text-muted">Streamers Activos</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem;" id="totalRecommendations">0</h3>
+                        <p class="text-muted">Recomendaciones Totales</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem;" id="totalUsers">0</h3>
+                        <p class="text-muted">Usuarios Registrados</p>
+                    </div>
+                </div>
+
+                <!-- Streamers List -->
+                <div class="card mb-4">
+                    <h2 class="mb-3">Streamers y Recomendaciones</h2>
+                    <div id="streamersList"></div>
+                </div>
+
+                <!-- Actions Log -->
+                <div class="card">
+                    <h2 class="mb-3">Registro de Acciones de Admin</h2>
+                    <div id="actionsLog"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Edit Score Modal -->
+    <div id="editScoreModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeEditModal()"></div>
+        <div class="modal-content card" style="max-width: 500px; margin: 5rem auto; position: relative; z-index: 10;">
+            <h2 class="mb-3">Modificar Puntuación</h2>
+            <div class="mb-3">
+                <label style="display: block; margin-bottom: 0.5rem;">Película</label>
+                <p id="editMovieTitle" class="text-muted"></p>
+            </div>
+            <div class="mb-3">
+                <label for="customScore" style="display: block; margin-bottom: 0.5rem;">Nueva Puntuación (0-10)</label>
+                <input type="number" id="customScore" min="0" max="10" step="0.1" style="width: 100%;">
+            </div>
+            <div class="flex gap-2">
+                <button class="btn btn-primary" onclick="saveCustomScore()" style="flex: 1;">Guardar</button>
+                <button class="btn btn-secondary" onclick="closeEditModal()" style="flex: 1;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+
+    <style>
+        .align-items-center {
+            align-items: center;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .recommendation-item {
+            padding: 1rem;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recommendation-item:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .log-entry {
+            padding: 0.75rem 1rem;
+            background: rgba(30, 27, 75, 0.4);
+            border-left: 3px solid var(--primary);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .log-entry .timestamp {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .streamer-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(30, 27, 75, 0.4);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .streamer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+    </style>
+</body>
+
+</html>
